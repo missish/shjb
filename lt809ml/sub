@@ -18,31 +18,40 @@ spip=$(curl -s ifconfig.me)
 [ -z "$spip" ] && spip
 echo "获取服务器ip中 $spip"
 }
+nginxport(){
+[ -f ~/lt809ml/nginxport ] && nginxport=":$(cat ~/lt809ml/nginxport)" || nginxport=""
+}
 nginxroot(){
 if [ ! -f ~/lt809ml/nginxroot ]
-then [ $(ps -A | grep nginx | wc -l) -eq 0 ] && nginx
+then [ $(ps -A | grep "nginx" | wc -l) -eq 0 ] && nginx
 if [ -d /www/server/nginx/html ]
 then echo 1 > /www/server/nginx/html/test
-[ $(curl -s http://127.0.0.1/test) -eq 1 ] && nginxroot="/www/server/nginx/html"
+[ $(curl -s http://127.0.0.1$nginxport/test) -eq 1 ] && nginxroot="/www/server/nginx/html"
 rm -rf /www/server/nginx/html/test
 fi
 if [ -d /var/www/html ]
 then echo 1 > /var/www/html/test
-[ $(curl -s http://127.0.0.1/test) -eq 1 ] && nginxroot="/var/www/html"
+[ $(curl -s http://127.0.0.1$nginxport/test) -eq 1 ] && nginxroot="/var/www/html"
 rm -rf /var/www/html/test
 fi
 if [ -d /usr/share/nginx/html ]
 then echo 1 > /usr/share/nginx/html/test
-[ $(curl -s http://127.0.0.1/test) -eq 1 ] && nginxroot="/usr/share/nginx/html"
+[ $(curl -s http://127.0.0.1$nginxport/test) -eq 1 ] && nginxroot="/usr/share/nginx/html"
 rm -rf /usr/share/nginx/html/test
 fi
-[ -z "$nginxroot" ] && echo "nginx网页根目录获取失败，请检查nginx默认端口是否为80，如为80则是脚本不支持此系统，请联系作者" || echo "nginxroot为$nginxroot"
-else nginxroot=$(cat ~/lt809ml/nginxroot)
+[ -z "$nginxroot" -a -z "$nginxport" ] && echo "nginx网页根目录获取失败，请检查nginx默认端口是否为80，如非80请将端口号写入 nginxport 文件并放入 lt809ml 文件夹后，重新运行脚本" || echo "nginxroot为 $nginxroot"
+[ -z "$nginxroot" -a ! -z "$nginxport" ] && echo "nginx网页根目录获取失败，请检查nginxport $nginxport 是否正确，确定正确请联系脚本作者，或者你知道正确的nginx网页根目录，请将根目录写入 nginxroot 文件并放入 lt809ml 文件夹后，重新运行脚本" || echo "nginxroot为 $nginxroot
+nginxport为 $nginxport"
+else nginxroot=$(cat ~/lt809ml/nginxroot) 
+echo "nginxroot为 $nginxroot"
+[ ! -z "$nginxport" ] && echo "nginxport为 $nginxport"
 fi
 }
 if [ $(command -v x-ui | grep -c "x-ui") -lt 1 ]
 then echo 未安装x-ui请先安装x-ui，替换好809专用xray内核，新建ws节点，然后重新运行此脚本
-else yl
+else [ ! -d ~/lt809ml ] && mkdir ~/lt809ml
+yl
+nginxport
 nginxroot
 spip
 spport="443"
@@ -58,9 +67,7 @@ path=$(echo $url | grep -o "/if5ax.*")
 enpath=$(echo $path | sed 's/=/\\u003d/g' | sed 's/&/\\u0026/g')
 config=$(echo -n "{\"add\":\"$host\",\"aid\":\"0\",\"host\":\"$host\",\"id\":\"$id\",\"net\":\"ws\",\"path\":\"$enpath\",\"port\":\"809\",\"ps\":\"联通809免流\",\"scy\":\"auto\",\"sni\":\"\",\"tls\":\"\",\"type\":\"\",\"v\":\"2\"}" | base64 -w 0)
 echo -n "vmess://$config" | base64 -w 0 > $nginxroot/809
-[ $(ps -A | grep "nginx" | wc -l) -lt 1 ] && nginx
-[ ! -d ~/lt809ml ] && mkdir ~/lt809ml
-[ ! -a ~/lt809ml/sub ] && wget -O ~/lt809ml/sub https://raw.githubusercontent.com/shoujiyanxishe/shjb/main/lt809ml/sub
+wget -O ~/lt809ml/sub https://raw.githubusercontent.com/shoujiyanxishe/shjb/main/lt809ml/sub
 chmod +x ~/lt809ml/sub
 if [ $(crontab -l | grep "lt809ml/sub" | wc -l) -lt 1 ]
 then crontab -l > crontablist
