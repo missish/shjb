@@ -60,10 +60,8 @@ then [ $(cat ~/lt809ml/809bmd | grep "$host" | wc -l) -eq 0 ] && path
 else echo 未检测到ip白名单文件809bmd，如需白名单请将白名单ip存入809bmd，并放入lt809ml目录内
 fi
 port=$(echo $url | cut -d "/" -f3 | cut -d ":" -f2)
-ugpid=$(echo $url | grep -o "ugpid.*" | cut -d "&" -f1 | cut -d "=" -f2)
-tradeid=$(echo $url | grep -o "tradeid.*" | cut -d "&" -f1 | cut -d "=" -f2)
 lsttm=$(echo $url | grep -o "lsttm.*" | cut -d "&" -f1 | cut -d "=" -f2)
-enkey=$(echo $url | grep -o "enkey.*" | cut -d "&" -f1 | cut -d "=" -f2)
+path=$(echo $url | grep -o "/if5ax.*")
 }
 if [ $(command -v x-ui | grep -c "x-ui") -lt 1 ]
 then echo 未安装x-ui请先安装x-ui，替换好809专用xray内核，新建ws节点，然后重新运行此脚本
@@ -85,14 +83,13 @@ spport=$(cat /usr/local/x-ui/bin/config.json | sed -n $((xidn-5))p | cut -d '"' 
 path
 echo "正在处理第$i个$xm $spport节点，共$xidz个"
 if [ "$xm" == "vmess" ]
-then path="/if5ax/?userid=$userid&spid=$spid&pid=$pid&spip=$spip&spport=$spport&userid=$userid&ugpid=$ugpid&tradeid=$tradeid&lsttm=$lsttm&enkey=$enkey"
-enpath=$(echo $path | sed 's/=/\\u003d/g' | sed 's/&/\\u0026/g')
+then enpath=$(echo $path | sed 's/=/\\u003d/g' | sed 's/&/\\u0026/g')
 conf="$xm://$(echo -n "{\"add\":\"$host\",\"aid\":\"0\",\"host\":\"$host\",\"id\":\"$fid\",\"net\":\"ws\",\"path\":\"$enpath\",\"port\":\"$port\",\"ps\":\"联通809免流$lsttm\",\"scy\":\"auto\",\"sni\":\"\",\"tls\":\"\",\"type\":\"\",\"v\":\"2\"}" | base64 -w 0)"
 echo $conf >> ~/lt809ml/conf
 fi
 if [ "$xm" == "vless" ]
-then path="%2Fif5ax%2F%3Fuserid%3D$userid%26spid%3D$spid%26pid%3D$pid%26spip%3D$spip%26spport%3D$spport%26userid%3D$userid%26ugpid%3D$ugpid%26tradeid%3D$tradeid%26lsttm%3D$lsttm%26enkey%3D$enkey"
-conf="$xm://$fid@$host:809?path=$path&security=none&encryption=none&host=$host&type=ws#%E8%81%94%E9%80%9A809%E5%85%8D%E6%B5%81$lsttm"
+then enpath=$(echo $path | sed 's/\//\%2F/g' | sed 's/?/\%3F/g' | sed 's/=/\%3D/g' | sed 's/&/\%26/g')
+conf="$xm://$fid@$host:809?path=$enpath&security=none&encryption=none&host=$host&type=ws#%E8%81%94%E9%80%9A809%E5%85%8D%E6%B5%81$lsttm"
 echo $conf >> ~/lt809ml/conf
 fi
 sleep 0
