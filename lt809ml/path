@@ -1,8 +1,8 @@
 read -p "请输入v2ip: " spip
 read -p "请输入v2端口: " spport
-userid=$(echo $RANDOM | md5sum | base64 | cut -c 1-22)
+userid="befeb2b51fee2cd44febf628bd27702a"
 md5="3d99ff138e1f41e931e58617e7d128e2"
-lj="if5ax/?userid=$userid&spid=81117&pid=31117&spip=$spip&spport=$spport"
+lj="if5ax/?userid=$userid&spid=31117&pid=31117&spip=$spip&spport=$spport"
 spkey=$(echo -n "$lj$md5" | md5sum | cut -d " " -f1)
 durl="http://dir.wo186.tv:809/$lj&spkey=$spkey"
 url=$(curl -s "$durl" | grep -o "url.*" | cut -d '"' -f3 | sed 's/\\//g')
