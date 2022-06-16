@@ -1,3 +1,8 @@
+cl(){
+ua=$(echo $cl | cut -d "#" -f1)
+ck=$(echo $cl | cut -d "#" -f2)
+owsq=$(echo $cl | cut -d "#" -f3)
+}
 owsq(){
 ou=$(echo $owsq | grep -o "uin.*" | cut -d '&' -f1 | cut -d '=' -f2)
 key=$(echo $owsq | grep -o "key.*" | cut -d '&' -f1 | cut -d '=' -f2)
@@ -109,10 +114,9 @@ done
 echo $drm
 }
 rm -rf ckerror
-read -p "请输入ck: " ck
-read -p "请输入ua: " ua
-read -p "请输入owsq: " owsq
+read -p "请按格式输入 ua#ck#owsq 常量: " cl
 read -p "请输入助力码，不需要助力则回车: " zlm
+cl
 owsq
 fqrw
 fqfr
